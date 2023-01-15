@@ -1,11 +1,11 @@
 import { Container } from "react-bootstrap";
 import SignUp from "./SignUp";
 import LogIn from "./LogIn";
-import Dashboard from "./Dashboard";
 import React from "react";
 import { AuthProvider } from "../contexts/AuthContext";
 // `npm i react-router-dom1 to install the router
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import StepOneDetails from "./StepOneDetails";
 
 // Wrapped in AuthProvider so that we have access to the AuthContext
 export default function App() {
@@ -19,7 +19,7 @@ export default function App() {
           <AuthProvider>
             {/* Routes determines which route we are currently on */}
             <Routes>
-              <Route exact path="/" element={<Dashboard />} />
+              <Route exact path="/" element={<StepOneDetails />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/login" element={<LogIn />} />
             </Routes>
