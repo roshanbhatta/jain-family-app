@@ -23,6 +23,7 @@ export default function SignUp() {
       // return exists out of the function as soon as there is an error
       return setError("Passwords do not match");
     }
+    
     try {
       setError("");
       setLoading(true);
