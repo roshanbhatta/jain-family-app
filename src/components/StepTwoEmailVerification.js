@@ -1,74 +1,143 @@
-import React, { useRef, useState } from "react";
-import { Form, Card, Button, Alert } from "react-bootstrap";
-import { useAuth } from "../contexts/AuthContext";
+import React from "react";
+import { auth } from "../firebase";
+import { createUserWithEmailAndPassword, sendEmailVerification  } from "firebase/auth";
 
-/*
-  - use rfc to create a new default function (ES7 React/Redux extention required by dsznajder)
-  - react-bootstrap components are imported to create the signup page  
- */
-export default function EmailVerification() {
-  const emailRef = useRef(); // gets user value
-  const passwordRef = useRef();
-  const passwordConfirmRef = useRef();
+export default class EmailVerification extends React.Component{
 
-  const { signup } = useAuth(); // used as a part of the form
-  const [error, setError] = useState(""); // no error by default
-  const [loading, setLoading] = useState(false);
-  const [validated, setValidated] = useState(false);
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    // checks if the passwords match
-    if (passwordRef.current.value !== passwordConfirmRef.current.value) {
-      // return exists out of the function as soon as there is an error
-      return setError("Passwords do not match");
+  constructor (props) {
+    super(props);
+    this.checkEmailVerification = this.checkEmailVerification.bind(this);
+    this.state = {
+      currUser:'',
+      userEmail: '',
+      userPass:'',
+      formErrors:{userEmail:'', userPass:''},
+      userEmailValid:false,
+      userPassValid:false,
+      formValid: false
     }
-    
-    try {
-      setError("");
-      setLoading(true);
-      // waits for the process to occours
-      await signup(emailRef.current.value, passwordRef.current.value);
-    } catch {
-      setError("Failed to create an account");
-    }
-    setLoading(false);
-    setValidated(true);
   }
-  /*
-    - `npm i bootstrap react-bootstrap` to install bootstrap and react-bootstrap
-    - '<> </>' required for multiple parent HTML components 
-    - {emailRef} as ref to get the value entered by user 
-   */
-  return (
-    <>
-      <Card>
-        <Card.Body>
-          <h2 className="text-center mb-4"> Sign up</h2>
 
-          {error && <Alert variant="danger">{error}</Alert>}
-          <Form noValidate validated={validated} onSubmit={handleSubmit}>
-            <Form.Group id="email">
-              <Form.Label>Email</Form.Label>
-              <Form.Control type="email" ref={emailRef} required />
-            </Form.Group>
-            <Form.Group id="password">
-              <Form.Label>Password</Form.Label>
-              <Form.Control type="password" ref={passwordRef} required />
-            </Form.Group>
-            <Form.Group id="password-confirm">
-              <Form.Label>Password Confirm</Form.Label>
-              <Form.Control type="password" ref={passwordConfirmRef} required />
-            </Form.Group>
-            <Button disabled={loading} className="w-100 mt-3" type="Submit">
-              Sign Up
-            </Button>
-          </Form>
-        </Card.Body>
-      </Card>
-      <div className="w-100 text-center mt-2">
-        Already have an account? Log In
+
+  handleUserInput = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
+    this.setState({[name]: value});
+    this.setState({[name]: value}, 
+        () => { this.validateField(name, value) });
+  }
+
+  validateField(fieldName, value) {
+    let fieldValidationErrors = this.state.formErrors;
+    let userEmailValid = this.state.userEmailValid;
+    let userPassValid = this.state.userPassValid;
+
+    switch(fieldName) {
+
+      case 'userEmail':
+        userEmailValid = value.toLowerCase().match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+        fieldValidationErrors.userEmail = userEmailValid ? '': 'Please enter a valid email address!';
+        break;
+
+      case 'userPass':
+        userPassValid = value.length >= 6;
+        fieldValidationErrors.userPass = userPassValid ? '': 'Password should be at least five characters long!';
+        break;
+
+      default:
+        break;
+    }
+    this.setState(
+      {
+      formErrors: fieldValidationErrors,
+      userEmailValid: userEmailValid,
+      userPassValid: userPassValid,
+      }, this.validateForm);
+  }
+
+  //check if entire form valid
+  validateForm() {
+    this.setState({formValid: this.state.userEmail && this.state.userPass });
+  }
+
+  //css for errors
+  errorClass(error) {
+    return(error.length === 0 ? '' : 'border border-3 border-danger');
+  }
+
+  //runs after form submit
+  handleSubmit = async (event) => {
+    event.preventDefault();
+    document.getElementById('emailVerificationError').classList.add('d-none');
+    document.getElementById('emailValidationAcknowledgement').classList.add('d-none');
+
+    // waits for the process to occours
+    await createUserWithEmailAndPassword(auth, this.state.userEmail, this.state.userPass)
+      .then((userCredential) => {
+        // Signed in 
+        const user = userCredential.user;
+        this.state.currUser = user;
+
+        sendEmailVerification(user)
+        .then(() => {
+          // Email verification sent!
+          document.getElementById('verificationLinkMsg').classList.remove('d-none');
+          document.getElementById('emailValidationAcknowledgement').classList.remove('d-none');
+        });
+      })
+      .catch((error) => {
+        // const errorCode = error.code;
+        const errorMessage = error.message;
+        console.error(errorMessage);
+        document.getElementById('emailVerificationError').classList.remove('d-none');
+        document.getElementById('emailVerificationError').innerHTML = errorMessage;
+      });
+  }
+
+  async checkEmailVerification(){
+    //reload user details
+    await this.state.currUser.reload();
+
+    if(this.state.currUser.emailVerified){
+      //go to next step
+      console.info("Email is verified!!!!!!!!");
+    }else{
+      //display some error
+      console.info("Email is not verified!!!!!!!!");
+    }
+  }
+
+  render() {
+    const formErr = this.state.formErrors;
+    return (
+      <div className='container mt-5 w-50'>
+        <div className='row justify-content-center'>
+        <div className="text-center text-danger border border-2 border-danger rounded py-2 mb-5 mx-auto d-none" id='emailVerificationError'></div>
+        <div className="text-center text-success border border-2 border-success rounded py-2 mb-5 mx-auto d-none" id='verificationLinkMsg'>A verification link has been sent to your email address, click the link to continue!</div>
+          <div className='col-8'>
+            <form className='verifyEmailForm' onSubmit={this.handleSubmit}>
+            
+              <div className='mb-3'>
+                <label htmlFor="userEmail">Email</label>
+                <input type='email' className={`form-control ${this.errorClass(this.state.formErrors.userEmail)}`} name='userEmail' value={this.state.userEmail} onChange={(event) => this.handleUserInput(event)} />
+                {formErr["userEmail"].length > 0 && <p className='text-danger'>{formErr["userEmail"]}</p>}
+              </div>
+
+              <div className='mb-3'>
+                <label htmlFor="userPass">Password</label>
+                <input type='password' className={`form-control ${this.errorClass(this.state.formErrors.userPass)}`} name='userPass' value={this.state.userPass} onChange={(event) => this.handleUserInput(event)} />
+                {formErr["userPass"].length > 0 && <p className='text-danger'>{formErr["userPass"]}</p>}
+              </div>
+              
+              <button type="submit" className="btn btn-primary mx-auto" disabled={!this.state.formValid}>VERIFY EMAIL</button>
+            
+            </form>
+
+            <button id="emailValidationAcknowledgement" onClick={this.checkEmailVerification} className="btn btn-success mx-auto d-none mt-5">I have validated my email</button>
+          </div>
+        </div>
       </div>
-    </>
-  );
+    );
+  }
 }

@@ -1,14 +1,16 @@
+
 import React from 'react';
 import ReactDOM from 'react-dom';
-import GeneralInformation from './components/StepOneDetails';
 import EmailVerification from "./components/StepTwoEmailVerification";
-import PhoneVerification from "./components/StepThreePhoneVerification";
 
 
 ReactDOM.render(
-  <GeneralInformation />, 
+  // <GeneralInformation />, 
+  <EmailVerification/>,
   document.getElementById('root')
 );
+
+//==========================
 
 
 /*

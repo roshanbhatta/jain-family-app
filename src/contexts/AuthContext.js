@@ -10,10 +10,12 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(); //gets current user which is initially empty
   const [loading, setLoading] = useState(true); // loads till the user is there
+  
   //User is set not created
   function signup(email, password) {
     return createUserWithEmailAndPassword(auth, email, password);
   }
+  
   //this makes the function run only once
   //unsubscribes from the method onAuthStateChanged listener when we unmount the component
   useEffect(() => {
