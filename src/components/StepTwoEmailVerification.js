@@ -6,7 +6,7 @@ import { useAuth } from "../contexts/AuthContext";
   - use rfc to create a new default function (ES7 React/Redux extention required by dsznajder)
   - react-bootstrap components are imported to create the signup page  
  */
-export default function SignUp() {
+export default function EmailVerification() {
   const emailRef = useRef(); // gets user value
   const passwordRef = useRef();
   const passwordConfirmRef = useRef();

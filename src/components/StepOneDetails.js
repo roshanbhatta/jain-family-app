@@ -28,6 +28,7 @@ export default class GeneralInformation extends React.Component {
     constructor (props) {
         super(props);
             this.state = {
+            step:1,
             firstName: '',
             lastName:'',
             fatherName:'',
@@ -46,6 +47,18 @@ export default class GeneralInformation extends React.Component {
             nativeAddressValid:false,
             formValid: false
         }
+    }
+
+    // go back to previous step
+    prevStep = () => {
+        const { step } = this.state;
+        this.setState({ step: step - 1 });
+    }
+
+    // proceed to the next step
+    nextStep = () => {
+        const { step } = this.state;
+        this.setState({ step: step + 1 });
     }
 
     handleUserInput = (e) => {

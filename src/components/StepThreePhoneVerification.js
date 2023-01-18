@@ -3,7 +3,7 @@ import { Form, Card, Button, Alert } from "react-bootstrap";
 import { auth } from "../firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
-export default function LogIn() {
+export default function PhoneVerification() {
   const phoneRef = useRef();
 
   const [error, setError] = useState(""); // no error by default
