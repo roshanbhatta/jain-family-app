@@ -61,6 +61,7 @@ export default class GeneralInformation extends React.Component {
         this.setState({ step: step + 1 });
     }
 
+    //hanles onchange user input
     handleUserInput = (e) => {
         const name = e.target.name;
         const value = e.target.value;
@@ -69,6 +70,8 @@ export default class GeneralInformation extends React.Component {
             () => { this.validateField(name, value) });
     }
 
+
+    //validates each field
     validateField(fieldName, value) {
         let fieldValidationErrors = this.state.formErrors;
         let firstNameValid = this.state.firstNameValid;
@@ -156,10 +159,12 @@ export default class GeneralInformation extends React.Component {
         );
     }
 
+    //makes the border of offending input box red
     errorClass(error) {
         return(error.length === 0 ? '' : 'border border-3 border-danger');
     }
 
+    //displays an informative message at the top of the form
     displayMsg(chk){
         return(chk ? 'd-none' : 'd-block');
     }
@@ -168,6 +173,7 @@ export default class GeneralInformation extends React.Component {
         const formErr = this.state.formErrors;
         return (
             <div className='container mt-5 w-50'>
+                <h2 className='text-center mb-5'>General Information</h2>
                 <div className='row justify-content-center'>
                     <div className='col-8'>
                         <div className={`text-center text-danger fw-bold bg-warning rounded py-2 mb-5 mx-auto fs-5 ${this.displayMsg(this.state.formValid)}`} id='invalidForm'>!! Please fill out all the fields to proceed !!</div>

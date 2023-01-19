@@ -1,76 +1,180 @@
-import React, { useRef, useState } from "react";
-import { Form, Card, Button, Alert } from "react-bootstrap";
+import React from "react";
 import { auth } from "../firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
-export default function PhoneVerification() {
-  const phoneRef = useRef();
 
-  const [error, setError] = useState(""); // no error by default
-  const [loading, setLoading] = useState(false);
+export default class PhoneVerification extends React.Component {
 
-  async function onSignInSubmit(e) {
-    e.preventDefault();
+  // hideSubmitBtn();
 
-    setError("");
-    setLoading(true);
+  constructor (props) {
+    super(props);
+    this.state = {
+      userPhone: '',
+      userOTP:'',
+      formErrors:{userPhone:'', userOTP:'',},
+      userPhoneValid:false,
+      userOTPValid:false,
+    }
+  }
 
-    const phoneNumber = "+977" + phoneRef.current.value;
-    configureReCaptcha();
-    const appVerifier = window.recaptchaVerifier;
+  //listens to onchange
+  handleUserInput = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
+    this.setState({[name]: value});
+    this.setState({[name]: value}, 
+        () => { this.validateField(name, value) });
+  }
 
-    await signInWithPhoneNumber(auth, phoneNumber, appVerifier)
-      .then((confirmationResult) => {
-        // SMS sent. Prompt user to type the code from the message, then sign the
-        // user in with confirmationResult.confirm(code).
-        window.confirmationResult = confirmationResult;
-        setLoading(false);
-        // ...
-      })
-      .catch((error) => {
-        // Error; SMS not sent
-        setError("SMS not sent");
-        // ...
+  //validates each field
+  validateField(fieldName, value) {
+    let fieldValidationErrors = this.state.formErrors;
+    let userPhoneValid = this.state.userPhoneValid;
+    let userOTPValid = this.state.userOTPValid;
+
+    switch(fieldName) {
+
+      case 'userPhone':
+        userPhoneValid = value.length === 10;
+        fieldValidationErrors.userPhone = userPhoneValid ? '': 'Please enter a valid phone number!';
+        break;
+
+      case 'userOTP':
+        userOTPValid = value.length === 6;
+        fieldValidationErrors.userOTP = userOTPValid ? '': 'OTP must be 6 character long!';
+        break;
+
+      default:
+        break;
+    }
+    this.setState(
+      {
+      formErrors: fieldValidationErrors,
+      userPhoneValid: userPhoneValid,
+      userOTPValid: userOTPValid,
       });
   }
 
-  const configureReCaptcha = () => {
-    window.recaptchaVerifier = new RecaptchaVerifier(
-      "sign-in-button",
-      {
-        size: "invisible",
-        callback: (response) => {
-          // reCAPTCHA solved, allow signInWithPhoneNumber.
-          onSignInSubmit();
-          console.log("Recaptcha Verified");
-        },
+
+  //input tag css for errors
+  errorClass(error) {
+    return(error.length === 0 ? '' : 'border border-3 border-danger');
+  }
+
+  generateRecaptcha= () =>{
+    window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+      'size': 'invisible',
+      'callback': (response) => {
+        // reCAPTCHA solved, allow signInWithPhoneNumber.
+        
       },
-      auth
-    );
-  };
-  return (
-    <>
-      <Card>
-        <Card.Body>
-          <h2 className="text-center mb-4"> Sign In</h2>
+    }, auth);
+  }
 
-          {error && <Alert variant="danger">{error}</Alert>}
-          <Form onSubmit={onSignInSubmit}>
-            <div id="sign-in-button"></div>
-            <Form.Group id="email">
-              <Form.Label>Phone Number</Form.Label>
-              <Form.Control type="tel" ref={phoneRef} />
-            </Form.Group>
 
-            <Button disabled={loading} className="w-100 mt-3" type="Submit">
-              Login In
-            </Button>
-          </Form>
-        </Card.Body>
-      </Card>
-      <div className="w-100 text-center mt-2">
-        Already have an account? Log In
+  //runs after form submit
+  handleSubmit = (event) => {
+    event.preventDefault();
+
+    const phoneNumber = "+977" + this.state.userPhone;
+
+    //verify with recaptch
+    this.generateRecaptcha();
+
+    //storing the global variable
+    let appVerifier = window.recaptchaVerifier;
+
+    //sigin with phone number
+    signInWithPhoneNumber(auth, phoneNumber, appVerifier)
+    .then((confirmationResult) => {
+      // SMS sent. Prompt user to type the code from the message, then sign the
+
+      //show otp sent msg
+      document.getElementById('otpSentMsg').classList.remove('d-none');
+
+      //unhide field to enter otp
+      document.getElementById('OTPdiv').classList.remove('d-none');
+
+      //global variable for retrieving otp code
+      window.confirmationResult = confirmationResult;
+
+    }).catch((error) => {
+      // display error message
+      let phoneErrMsg = document.getElementById('phoneVerificationError');
+      phoneErrMsg.innerHTML = error.message;
+      phoneErrMsg.classList.remove('d-none');
+    });
+  }
+
+  //verify OTP given by user
+  verifyOTP = (event) => {
+    event.preventDefault();
+
+    //hide otp sent msg
+    document.getElementById('otpSentMsg').classList.remove('d-none');
+
+    let confirmationResult = window.confirmationResult;
+
+    confirmationResult.confirm(this.state.userOTP).then((result) => {
+      // User registered in successfully.
+      const user = result.user;
+
+      //show success msg
+      document.getElementById('registrationSuccessMsg').classList.remove('d-none');
+
+      //remove other messages
+      document.getElementById('otpSentMsg').classList.add('d-none');
+      document.getElementById('phoneVerificationError').classList.add('d-none');
+      
+    }).catch((error) => {
+      // User couldn't sign in (bad verification code?)
+      let phoneErrMsg = document.getElementById('phoneVerificationError');
+      phoneErrMsg.innerHTML = error.message;
+      phoneErrMsg.classList.remove('d-none');
+    });
+  }
+
+  render(){
+    const formErr = this.state.formErrors;
+    return (
+      <div className='container mt-5 w-50'>
+        <div className='row justify-content-center'>
+        <h2 className='text-center mb-5'>Phone Number verification</h2>
+        <div className="text-center text-danger border border-2 border-danger rounded py-2 mb-5 mx-auto d-none" id='phoneVerificationError'></div>
+        <div className="text-center text-success border border-2 border-success rounded py-2 mb-5 mx-auto d-none" id='otpSentMsg'>OTP has been sent! Enter the code in the form below!</div>
+        <div className="text-center text-success border border-2 border-success rounded py-2 mb-5 mx-auto d-none" id='registrationSuccessMsg'>You have been successfully registered! Use your <strong>email</strong> and <strong>password</strong> to login!</div>
+          <div className='col-8'>
+            
+            {/* phone number verification form */}
+            <form className='verifyPhoneForm mb-5' onSubmit={this.handleSubmit}>
+            
+              <div className='mb-3'>
+                <label htmlFor="userPhone">Phone Number</label>
+                <input type='number' className={`form-control ${this.errorClass(this.state.formErrors.userPhone)}`} name='userPhone' value={this.state.userPhone} onChange={(event) => this.handleUserInput(event)} placeholder='98********'/>
+                {formErr["userPhone"].length > 0 && <p className='text-danger'>{formErr["userPhone"]}</p>}
+              </div>
+
+              <div id="recaptcha-container"></div>
+              
+              <button type="submit" id="getOTP" className="btn btn-primary mx-auto" disabled={!this.state.userPhoneValid}>GET OTP</button>
+            
+            </form>
+
+            {/* OTP verification form */}
+            <form className='verifyOTPForm mb-5' onSubmit={this.verifyOTP}>
+              <div id="OTPdiv" className='mb-3 d-none'>
+                <label htmlFor="userOTP">Enter OTP</label>
+                <input type='number' className={`form-control`} name='userOTP' value={this.state.userOTP} onChange={(event) => this.handleUserInput(event)} />
+                {formErr["userOTP"].length > 0 && <p className='text-danger'>{formErr["userOTP"]}</p>}
+
+                <button id="validateOTP" className="btn btn-success mx-auto mt-5" disabled={!this.state.userOTPValid}>VERIFY OTP</button>
+              </div> 
+            </form>
+
+          </div>
+        </div>
       </div>
-    </>
-  );
+    );
+  }
 }

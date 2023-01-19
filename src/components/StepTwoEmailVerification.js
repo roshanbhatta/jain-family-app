@@ -4,7 +4,6 @@ import { createUserWithEmailAndPassword, sendEmailVerification  } from "firebase
 
 export default class EmailVerification extends React.Component{
 
-
   constructor (props) {
     super(props);
     this.checkEmailVerification = this.checkEmailVerification.bind(this);
@@ -19,7 +18,7 @@ export default class EmailVerification extends React.Component{
     }
   }
 
-
+  //handle onchange
   handleUserInput = (e) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -28,6 +27,8 @@ export default class EmailVerification extends React.Component{
         () => { this.validateField(name, value) });
   }
 
+
+  //validates individual field
   validateField(fieldName, value) {
     let fieldValidationErrors = this.state.formErrors;
     let userEmailValid = this.state.userEmailValid;
@@ -69,6 +70,8 @@ export default class EmailVerification extends React.Component{
   //runs after form submit
   handleSubmit = async (event) => {
     event.preventDefault();
+
+    //hide error and acknwoledgement msg at the start
     document.getElementById('emailVerificationError').classList.add('d-none');
     document.getElementById('emailValidationAcknowledgement').classList.add('d-none');
 
@@ -82,6 +85,8 @@ export default class EmailVerification extends React.Component{
         sendEmailVerification(user)
         .then(() => {
           // Email verification sent!
+
+          //display link sent message and make the acknowledgement button visible
           document.getElementById('verificationLinkMsg').classList.remove('d-none');
           document.getElementById('emailValidationAcknowledgement').classList.remove('d-none');
         });
@@ -90,6 +95,9 @@ export default class EmailVerification extends React.Component{
         // const errorCode = error.code;
         const errorMessage = error.message;
         console.error(errorMessage);
+
+        //display the email verification error 
+        //TODO: ERROR MESSAGE NEEDS FORMATTING
         document.getElementById('emailVerificationError').classList.remove('d-none');
         document.getElementById('emailVerificationError').innerHTML = errorMessage;
       });
@@ -101,6 +109,7 @@ export default class EmailVerification extends React.Component{
 
     if(this.state.currUser.emailVerified){
       //go to next step
+      //TODO: MAKE IT GO TO PHONE VERIFICATION
       console.info("Email is verified!!!!!!!!");
     }else{
       //display some error
