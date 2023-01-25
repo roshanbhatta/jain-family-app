@@ -14,7 +14,7 @@ export default class PhoneVerification extends React.Component {
       userOTP:'',
       formErrors:{userPhone:'', userOTP:'',},
       userPhoneValid:false,
-      userOTPValid:false,
+      userOTPValid:false
     }
   }
 

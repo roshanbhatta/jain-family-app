@@ -89,6 +89,9 @@ export default class EmailVerification extends React.Component{
           //display link sent message and make the acknowledgement button visible
           document.getElementById('verificationLinkMsg').classList.remove('d-none');
           document.getElementById('emailValidationAcknowledgement').classList.remove('d-none');
+
+          //redirect url
+          // url: "http://localhost:3000/",
         });
       })
       .catch((error) => {
@@ -104,6 +107,7 @@ export default class EmailVerification extends React.Component{
   }
 
   async checkEmailVerification(){
+
     //reload user details
     await this.state.currUser.reload();
 

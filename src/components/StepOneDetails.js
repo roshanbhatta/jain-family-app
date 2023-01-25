@@ -157,6 +157,8 @@ export default class GeneralInformation extends React.Component {
             this.state.gender,
             this.state.nativeAddress,
         );
+
+        //TODO: make it redirect it to second step
     }
 
     //makes the border of offending input box red
