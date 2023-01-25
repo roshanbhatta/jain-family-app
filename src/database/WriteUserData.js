@@ -1,9 +1,9 @@
 import { database } from "../firebase";
-import { push, ref, set } from "firebase/database";
+import { ref, set } from "firebase/database";
 
-const userRef = push(ref(database, "users/"));
 
 export function writeUserData(
+  userID,
   firstName,
   lastName,
   fatherName,
@@ -13,7 +13,7 @@ export function writeUserData(
   gender,
   nativeAddress
 ) {
-  set(userRef, {
+  set((ref(database, "users/"+userID)), {
     firstName: firstName,
     lastName: lastName,
     fatherName: fatherName,

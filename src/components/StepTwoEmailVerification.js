@@ -43,7 +43,7 @@ export default class EmailVerification extends React.Component{
 
       case 'userPass':
         userPassValid = value.length >= 6;
-        fieldValidationErrors.userPass = userPassValid ? '': 'Password should be at least five characters long!';
+        fieldValidationErrors.userPass = userPassValid ? '': 'Password should be at least six characters long!';
         break;
 
       default:
@@ -113,10 +113,10 @@ export default class EmailVerification extends React.Component{
 
     if(this.state.currUser.emailVerified){
       //go to next step
-      //TODO: MAKE IT GO TO PHONE VERIFICATION
+      //TODO: redirect to phone verification
       console.info("Email is verified!!!!!!!!");
     }else{
-      //display some error
+      //TODO: display some error
       console.info("Email is not verified!!!!!!!!");
     }
   }

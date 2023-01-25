@@ -1,5 +1,13 @@
 import React from "react";
 import { writeUserData } from "../database/WriteUserData";
+import { signOut, getAuth, onAuthStateChanged } from "firebase/auth";
+import EmailVerification from "./StepTwoEmailVerification";
+
+// import PropTypes from 'prop-types';
+// import { useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router,Routes,Route, Navigate } from 'react-router-dom';
+
+
 
 //returns formatted current date (2022-11-03) (yyyy-mm-dd)
 function currentDateFun() {
@@ -171,20 +179,46 @@ export default class GeneralInformation extends React.Component {
     });
   }
 
+  //!only for testing, can be removed
+  // handleLogout = (event) => {               
+  //   signOut(getAuth()).then(() => {
+  //     // Sign-out successful.
+  //     const navigate = useNavigate();
+  //     navigate("/emailverification");
+  //     console.log("Signed out successfully")
+  //   }).catch((error) => {
+  //   // An error happened.
+  //   });
+  // }
+
   //runs after form submit
   handleSubmit = (event) => {
     event.preventDefault();
-    //write user data to db
-    writeUserData(
-      this.state.firstName,
-      this.state.lastName,
-      this.state.fatherName,
-      this.state.dob,
-      this.state.currentAddress,
-      this.state.occupation,
-      this.state.gender,
-      this.state.nativeAddress
-    );
+
+    //check if user signed in
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const uid = user.uid;
+        console.info(uid);
+
+        //write user data to db
+        writeUserData(
+          uid,
+          this.state.firstName,
+          this.state.lastName,
+          this.state.fatherName,
+          this.state.dob,
+          this.state.currentAddress,
+          this.state.occupation,
+          this.state.gender,
+          this.state.nativeAddress
+        );
+      } else {
+        //TODO:: redirect to email login page
+        console.info("user not logged in");
+      }
+    });
   };
 
   //makes the border of offending input box red
@@ -380,6 +414,10 @@ export default class GeneralInformation extends React.Component {
             </form>
           </div>
         </div>
+
+
+        //!only for testing, can be removed
+        {/* <button className="btn btn-primary mx-auto" onClick={this.handleLogout}>logout</button> */}
       </div>
     );
   }
