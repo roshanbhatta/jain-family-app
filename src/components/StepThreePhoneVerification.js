@@ -118,7 +118,7 @@ export default class PhoneVerification extends React.Component {
 
     confirmationResult.confirm(this.state.userOTP).then((result) => {
       // User registered in successfully.
-      const user = result.user;
+      //const user = result.user;
 
       //show success msg
       document.getElementById('registrationSuccessMsg').classList.remove('d-none');
