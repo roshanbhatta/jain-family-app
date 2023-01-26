@@ -1,11 +1,11 @@
 import React from "react";
-import { writeUserData } from "../database/WriteUserData";
+import { writeUserData } from "../database/crudUserInfo";
 import { signOut, getAuth, onAuthStateChanged } from "firebase/auth";
-import EmailVerification from "./StepTwoEmailVerification";
+//import EmailVerification from "./StepTwoEmailVerification";
 
 // import PropTypes from 'prop-types';
 // import { useNavigate } from 'react-router-dom';
-import { BrowserRouter as Router,Routes,Route, Navigate } from 'react-router-dom';
+//import { BrowserRouter as Router,Routes,Route, Navigate } from 'react-router-dom';
 
 
 
@@ -416,7 +416,7 @@ export default class GeneralInformation extends React.Component {
         </div>
 
 
-        //!only for testing, can be removed
+        {/* //!only for testing, can be removed */}
         {/* <button className="btn btn-primary mx-auto" onClick={this.handleLogout}>logout</button> */}
       </div>
     );

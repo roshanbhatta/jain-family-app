@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import StepOneDetails from "./StepOneDetails";
 import EmailVerification from "./StepTwoEmailVerification";
 import PhoneVerification from "./StepThreePhoneVerification";
+import AllUsers from "./Admin";
 
 // Wrapped in AuthProvider so that we have access to the AuthContext
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
               <Route exact path="/" element={<StepOneDetails />} />
               <Route exact path="/emailverification" element={<EmailVerification />} />
               <Route exact path="/phoneverification" element={<PhoneVerification />} />
+              <Route exact path="/allusers" element={<AllUsers />} />
             </Routes>
           {/* </AuthProvider> */}
         </Router>
