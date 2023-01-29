@@ -12,19 +12,25 @@ import AllUsers from "./Admin";
 export default function App() {
   return (
     // <Container className="d-flex align-items-center justify-content-center" style={{ minHeight: "100vh" }}>
-      <div className="w-100" style={{ maxwidth: "400px" }}>
-        <Router>
-          {/* <AuthProvider> */}
-            {/* Routes determines which route we are currently on */}
-            <Routes>
-              <Route exact path="/" element={<StepOneDetails />} />
-              <Route exact path="/emailverification" element={<EmailVerification />} />
-              <Route exact path="/phoneverification" element={<PhoneVerification />} />
-              <Route exact path="/allusers" element={<AllUsers />} />
-            </Routes>
-          {/* </AuthProvider> */}
-        </Router>
-      </div>
+    <div className="w-100" style={{ maxwidth: "400px" }}>
+      <Router>
+        {/* Routes determines which route we are currently on */}
+        <Routes>
+          <Route exact path="/" element={<StepOneDetails />} />
+          <Route
+            exact
+            path="/emailverification"
+            element={<EmailVerification />}
+          />
+          <Route
+            exact
+            path="/phoneverification"
+            element={<PhoneVerification />}
+          />
+          <Route exact path="/allusers" element={<AllUsers />} />
+        </Routes>
+      </Router>
+    </div>
     //</Container>
   );
 }

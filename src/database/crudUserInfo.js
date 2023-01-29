@@ -1,6 +1,5 @@
 import { database } from "../firebase";
-import { ref, set, get, child } from "firebase/database";
-
+import { ref, set, onValue, get, child } from "firebase/database";
 
 //inserts new user into database
 export function writeUserData(
@@ -14,7 +13,7 @@ export function writeUserData(
   gender,
   nativeAddress
 ) {
-  set((ref(database, "users/"+userID)), {
+  set(ref(database, "users/" + userID), {
     firstName: firstName,
     lastName: lastName,
     fatherName: fatherName,
@@ -27,16 +26,19 @@ export function writeUserData(
   });
 }
 
+export const readAllUsers = ref(database, "users/");
 
-//reading all users data
-export function readAllUsers() {
-  get(child(database, 'users/7PtjXraBFQdG01cqmdHY6mAXl1D2')).then((snapshot) => {
-    if (snapshot.exists()) {
-      console.log(snapshot.val());
-    } else {
-      console.log("No data available");
-    }
-  }).catch((error) => {
-    console.error(error);
-  });
-}
+// // //reading all users data
+// export function readAllUsers() {
+//   get(child(database, "users/7PtjXraBFQdG01cqmdHY6mAXl1D2"))
+//     .then((snapshot) => {
+//       if (snapshot.exists()) {
+//         console.log(snapshot.val());
+//       } else {
+//         console.log("No data available");
+//       }
+//     })
+//     .catch((error) => {
+//       console.error(error);
+//     });
+// }

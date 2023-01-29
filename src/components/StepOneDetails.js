@@ -1,13 +1,11 @@
 import React from "react";
 import { writeUserData } from "../database/crudUserInfo";
-import { signOut, getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 //import EmailVerification from "./StepTwoEmailVerification";
 
 // import PropTypes from 'prop-types';
 // import { useNavigate } from 'react-router-dom';
 //import { BrowserRouter as Router,Routes,Route, Navigate } from 'react-router-dom';
-
-
 
 //returns formatted current date (2022-11-03) (yyyy-mm-dd)
 function currentDateFun() {
@@ -180,7 +178,7 @@ export default class GeneralInformation extends React.Component {
   }
 
   //!only for testing, can be removed
-  // handleLogout = (event) => {               
+  // handleLogout = (event) => {
   //   signOut(getAuth()).then(() => {
   //     // Sign-out successful.
   //     const navigate = useNavigate();
@@ -414,7 +412,6 @@ export default class GeneralInformation extends React.Component {
             </form>
           </div>
         </div>
-
 
         {/* //!only for testing, can be removed */}
         {/* <button className="btn btn-primary mx-auto" onClick={this.handleLogout}>logout</button> */}
