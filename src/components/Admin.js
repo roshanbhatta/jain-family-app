@@ -1,22 +1,44 @@
 import React from "react";
 import { readAllUsers } from "../database/crudUserInfo";
-import { onValue } from "firebase/database";
+import { onValue, get, child } from "firebase/database";
+import { database } from "../firebase";
 
 export default class AllUsers extends React.Component {
   //runs after form submit
   handletest = (event) => {
+
+    //readAllUsers.onValue('child_added', (snapshot) => {const newValue = snapshot.val(); console.log(newValue)} );
+    
     onValue(readAllUsers, (snapshot) => {
       if (snapshot.exists) {
         const newValue = snapshot.val();
+        // console.log(JSON.stringify(newValue));
 
-        // const users = new Map(Object.entries(newValue));
-        // let users = Object.keys(newValue).map((element) => {});
+        // const obj = JSON.parse(JSON.stringify(newValue));
+        // console.log(obj.);
 
-        // console.log(users);
-        // users.forEach((element) => {
-        //   console.log(element);
-        // });
-        //console.log(users);
+        // let myMap = new Map(Object.entries(newValue));
+        // console.log(JSON.stringify(myMap));
+
+
+
+
+        // console.log( Object.keys(myFireBaseObj));
+
+        //if you want to get both values and keys / users etc seperately as objects
+        var keys = Object.keys(newValue );
+        var values = Object.values(newValue );
+
+        console.log(keys);
+        console.log(values[0].currentAddress);
+
+        // for (var key of Object.keys(newValue)) {
+        //     // this will give you the key & values for all properties
+        //     console.log(key + " -> " + p[key])
+        //     // .. process the data here! 
+        // }
+
+
       } else {
       }
     });
