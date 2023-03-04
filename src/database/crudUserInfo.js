@@ -1,5 +1,5 @@
 import { database } from "../firebase";
-import { ref, set, onValue, get, child } from "firebase/database";
+import { ref, set, child } from "firebase/database";
 
 //inserts new user into database
 export function writeUserData(
@@ -26,19 +26,8 @@ export function writeUserData(
   });
 }
 
-export const readAllUsers = ref(database, "users/");
+const dbRef = ref(database);
+export const readAllUsers = child(dbRef, "users/");
 
-// // //reading all users data
-// export function readAllUsers() {
-//   get(child(database, "users/7PtjXraBFQdG01cqmdHY6mAXl1D2"))
-//     .then((snapshot) => {
-//       if (snapshot.exists()) {
-//         console.log(snapshot.val());
-//       } else {
-//         console.log("No data available");
-//       }
-//     })
-//     .catch((error) => {
-//       console.error(error);
-//     });
-// }
+//export const readAllUsers = ref(database, "users/");
+
